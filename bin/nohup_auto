@@ -55,9 +55,26 @@ if __name__ == "__main__":
             if item not in ignore_file:
                 subprocess.run(f"echo \"{item}\" >> .gitiginore", shell=True)
 
+    # Kill all processes
+    elif subcommand == "killall";
+        pass
+
+    # Register program for the start all option
+    elif subcommand == "register";
+        pass
+
+    # Unregister the program from the start all option
+    elif subcommand == "unregister";
+        pass
+
+    # Start all registered programs
+    elif subcommand == "startreg":
+        pass
+
     # Someone was being annoying and gave us an invalid command
     else:
         print(f"Argument {subcommand} not recognized; valid commands are start, kill, status, updategitignore; get good scrub :)")
+        print("A few new commands are killall, register, unregister, startreg.")
 
 # If someone tries to import this ask them to stop lmao
 else:
