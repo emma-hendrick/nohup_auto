@@ -114,7 +114,6 @@ __pypackages__/
 
 # Celery stuff
 celerybeat-schedule
-celerybeat.pid
 
 # SageMath parsed files
 *.sage.py
@@ -159,5 +158,5 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 *.pid
-nohup.start.script
+nohup.auto.start
 nohup.active

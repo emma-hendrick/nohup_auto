@@ -34,12 +34,32 @@ def nohup_active():
     return f"{script_dir}/nohup.active"
 
 
+# Add lines to a file in a directory if they are not already there
+def add_lines(filename, lines_needed):
+ 
+    # Get the current gitignore
+    subprocess.run(["touch", filename])
+    ignore_file = subprocess_result(["cat", filename])
+
+    # Add the needed lines to the file
+    for item in lines_needed:
+        if item not in ignore_file:
+            subprocess.run(f"echo \"{item}\" >> {filename}", shell=True)
+
+
+# Remove lines from a file in a directory if they are there
+def remove_lines(filename, lines_to_remove):
+    exclude_arg = "|".join(lines_to_remove)
+    subprocess.run(f"grep -v -E '{exclude_arg}' {filename} > .temp; mv .temp {filename}", shell=True)
+
+
 # Kill a nohup instance in a specific location
 def kill(directory):
 
     # Get the relevant files
     pid_filename = nohup_pid(directory)
     log_filename = nohup_log(directory)
+    active_filename = nohup_active()
 
     # Get the pid
     subprocess.run(["touch", pid_filename])
@@ -53,6 +73,7 @@ def kill(directory):
     subprocess.run(["rm", log_filename])
 
     # Remove the dir from nohup.active
+    remove_lines(active_filename, [current_working_directory])
 
 
 # Start a nohup_instance in a specific location
@@ -62,6 +83,7 @@ def start(directory):
     pid_filename = nohup_pid(directory)
     log_filename = nohup_log(directory)
     script_filename = nohup_script(directory)
+    active_filename = nohup_active()
 
     # Get the start command to use from nohup.start.script
     command = subprocess_result(["cat", script_filename])
@@ -70,23 +92,18 @@ def start(directory):
     subprocess.run(f"nohup {command} > {log_filename} & echo $! > {pid_filename}", shell=True)
 
     # Add the directory to nohup.active
+    subprocess.run(["touch", active_filename])
+    add_lines(active_filename, [current_working_directory])
 
 
 # Update the gitignore at a specific location
 def update_gitignore(directory):
 
-    # Get the relevant files
+    # Get the relevant file
     gitignore = get_ignore(directory)
 
-    # Get the current gitignore
-    subprocess.run(["touch", gitignore])
-    ignore_file = subprocess_result(["cat", gitignore])
-
     # Add each line its missing
-    lines_needed = ["*.pid", "*.log", "nohup.auto.start"]
-    for item in lines_needed:
-        if item not in ignore_file:
-            subprocess.run(f"echo \"{item}\" >> {gitignore}", shell=True)
+    add_lines(gitignore, ["*.pid", "*.log", "nohup.auto.start"])       
 
 
 # Get the log of a current nohup instance in a specific location
@@ -146,7 +163,7 @@ if __name__ == "__main__":
         pass
 
     # Kill all registered programs in that list
-    elif subcommand = "killreg":
+    elif subcommand == "killreg":
         pass
 
     # Someone was being annoying and gave us an invalid command
