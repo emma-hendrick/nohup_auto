@@ -84,7 +84,7 @@ def kill(directory):
     subprocess.run(["rm", log_filename])
 
     # Remove the dir from nohup.active
-    remove_lines(active_filename, [current_working_directory])
+    remove_lines(active_filename, [directory])
 
 
 # Start a nohup_instance in a specific location
@@ -101,14 +101,14 @@ def start(directory):
     command = subprocess_result(["cat", script_filename])
 
     # Start the process in the background
-    subprocess.run(f"nohup {command} > {log_filename} & echo $! > {pid_filename}", shell=True)
+    subprocess.run(f"nohup {command} > {log_filename} & echo $! > {pid_filename}", cwd=directory, shell=True)
     pid_contents = get_file_split(pid_filename)
     ct = datetime.datetime.now()
     subprocess.run(f"echo '{pid_contents} | {directory} | {ct}' >> {history_filename}", shell=True)
 
     # Add the directory to nohup.active
     subprocess.run(["touch", active_filename])
-    add_lines(active_filename, [current_working_directory])
+    add_lines(active_filename, [directory])
 
 
 # Update the gitignore at a specific location
@@ -154,11 +154,8 @@ if __name__ == "__main__":
             start(current_working_directory)
 
         elif args[0] == "all":
-            # Get the dirs from nohup.active
-            dirs = get_file_split(nohup_active())
-            for item in dirs:
-                start(item)
-
+            print("All is a reserved word, and is not a valid list name.")
+        
         else:
             # Kill all or a specific registered list
             list_file = reg_list(args[0])
