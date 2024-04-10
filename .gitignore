@@ -161,3 +161,4 @@ cython_debug/
 nohup.auto.start
 nohup.active
 nohup.reg.*
+nohup.history
